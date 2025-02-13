@@ -6,7 +6,6 @@ export default function AddUser() {
     email: "",
     phone: "",
     rfid: "",
-    enrollment: "",
   });
 
   const handleChange = (e) => {
@@ -23,7 +22,6 @@ export default function AddUser() {
       email: "",
       phone: "",
       rfid: "",
-      enrollment: "",
     });
   };
 
@@ -103,23 +101,6 @@ export default function AddUser() {
                 value={formData.rfid}
                 onChange={handleChange}
                 placeholder="Enter RFID number"
-                required
-                className="w-full px-4 py-2 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-              />
-            </div>
-
-            {/* Enrollment Number Field */}
-            <div>
-              <label htmlFor="enrollment" className="block text-sm text-white mb-2">
-                Enrollment Number
-              </label>
-              <input
-                type="text"
-                id="enrollment"
-                name="enrollment"
-                value={formData.enrollment}
-                onChange={handleChange}
-                placeholder="Enter enrollment number"
                 required
                 className="w-full px-4 py-2 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
               />

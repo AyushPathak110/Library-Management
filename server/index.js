@@ -1,17 +1,30 @@
-import express from "express"
-import 'express-async-errors'
-import mongoose from "mongoose"
+import express from "express";
+import "express-async-errors";
+import mongoose from "mongoose";
+import book from "./routes/book.js";
+import cors from "cors";
 
-const tasks = require("./routes/tasks");
+const app = express();
 
-const app = express()
+app.use(cors());
 
+// If you want to allow only a specific frontend (e.g., React running on port 5173)
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Change this if your frontend runs on a different port
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
+app.use(express.json());
+app.use("/api/book", book);
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/library-management")
-  .then(() => console.log("Connected!"))
-  .catch(() =>
-    console.log("Some error was encountered while connecting with the database")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) =>
+    console.error("Error connecting to the database:", err)
   );
 
-app.listen(8080)
+app.listen(8080, () => console.log("Server running on port 8080"));

@@ -57,9 +57,9 @@ export default function Navbar() {
             stroke="currentColor"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M4 6h16M4 12h16M4 18h16"
             />
           </svg>
@@ -95,7 +95,7 @@ export default function Navbar() {
           </Link>
           <Link
             to="/issue-history"
-            className="block text-white bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-md transition-colors duration-300"
+            className="block text-white bg-gray-700 hover:bg-gray-600 px-4 mt-2 py-2 rounded-md transition-colors duration-300"
           >
             History
           </Link>
