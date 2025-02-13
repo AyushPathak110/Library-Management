@@ -20,6 +20,20 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  issuedBooks: [
+    {
+      bookId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Book", // Reference to the Book model
+      },
+      issueDate: {
+        type: Date,
+      },
+      returnDate: {
+        type: Date,
+      },
+    },
+  ],
 }, { timestamps: true });
 
 export default mongoose.model("User", UserSchema);

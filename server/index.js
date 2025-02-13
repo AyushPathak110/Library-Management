@@ -7,8 +7,6 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors());
-
 // If you want to allow only a specific frontend (e.g., React running on port 5173)
 app.use(
   cors({
