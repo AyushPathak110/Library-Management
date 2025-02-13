@@ -1,27 +1,46 @@
 import express from "express";
-import User from "../models/User.js";
+import User from "../models/user.js";
+import Book from "../models/book.js";
 
 const router = express.Router();
 
-// GET route to fetch a single user by RFID number
-router.get("/:rfidNumber", async (req, res) => {
-    try {
-      const { rfidNumber } = req.params;
-  
-      // Find user by RFID number
-      const user = await User.findOne({ rfidNumber });
-  
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      res.status(200).json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+// Return book route
+router.post("/return-book", async (req, res) => {
+  try {
+    const { userId, bookId } = req.body;
+
+    if (!userId || !bookId) {
+      return res.status(400).json({ message: "User ID and Book ID are required" });
     }
-  });
-  
+
+    // Find user and remove book from issuedBooks
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const bookIndex = user.issuedBooks.findIndex((book) => book.bookId.toString() === bookId);
+    if (bookIndex === -1) {
+      return res.status(404).json({ message: "Book not found in issued list" });
+    }
+
+    user.issuedBooks.splice(bookIndex, 1); // Remove book from issuedBooks
+    await user.save();
+
+    // Increment book quantity
+    const book = await Book.findById(bookId);
+    if (book) {
+      book.quantity += 1;
+      await book.save();
+    }
+
+    res.status(200).json({ message: "Book returned successfully", user });
+  } catch (error) {
+    console.error("Error returning book:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 // POST route to add a new user
 router.post("/add", async (req, res) => {
@@ -55,6 +74,17 @@ router.post("/add", async (req, res) => {
   }
 });
 
+// GET route to fetch all users
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find()
+      .populate("issuedBooks.bookId", "bookName"); // Populating bookName from Book model
 
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
 export default router;
