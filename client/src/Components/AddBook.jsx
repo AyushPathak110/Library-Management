@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 export default function AddBook() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,8 @@ export default function AddBook() {
     section: "",
     publication: "",
   });
+
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,14 +32,44 @@ export default function AddBook() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Book data submitted:", formData);
-    handleReset();
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/book/add",
+        formData
+      );
+      setMessage({ text: response.data.message, type: "success" });
+      handleReset();
+    } catch (error) {
+      setMessage({
+        text: error.response?.data?.message || "Failed to add book",
+        type: "error",
+      });
+    }
+
+    // Hide message after 3 seconds
+    setTimeout(() => setMessage({ text: "", type: "" }), 1400);
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      {/* Notification Message */}
+      {message.text && (
+        <div
+          className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-white text-center z-50 transition-all duration-500 ${
+            message.type === "success" ? "bg-green-600" : "bg-red-600"
+          } ${
+            message.text
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 -translate-y-4 scale-95"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
       {/* Form Section */}
       <div className="flex justify-center items-center p-6 bg-gray-800">
         <div className="w-full max-w-lg relative">
