@@ -47,7 +47,7 @@ export default function EditBook() {
       setMessage({ text: "Book updated successfully!", type: "success" });
 
       setTimeout(() => {
-        navigate("/");
+        navigate("/"); // Redirect to search page
       }, 1500);
     } catch (error) {
       setMessage({ text: "Failed to update book", type: "error" });
@@ -144,7 +144,7 @@ export default function EditBook() {
             <div className="flex justify-between space-x-4">
               <button
                 type="button"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/search")}
                 className="w-full sm:w-auto px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
               >
                 Cancel
