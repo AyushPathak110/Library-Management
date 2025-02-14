@@ -8,6 +8,7 @@ const bookSchema = new mongoose.Schema(
     quantity: { type: Number, required: true },
     section: { type: String, required: true },
     publication: { type: String, required: true },
+    // isIssued: { type: Boolean, default: false }, // Added field
   },
   { timestamps: true }
 );

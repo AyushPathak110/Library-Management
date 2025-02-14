@@ -4,7 +4,6 @@ import Book from "../models/book.js";
 import mongoose from "mongoose";
 const router = express.Router();
 
-// Return book route with RFID for both user and book
 router.post("/return-book", async (req, res) => {
   try {
     const { userRfid, bookRfid } = req.body;
@@ -13,30 +12,37 @@ router.post("/return-book", async (req, res) => {
       return res.status(400).json({ message: "User RFID and Book RFID are required" });
     }
 
-    // Find user by RFID
-    const user = await User.findOne({ rfidNumber: userRfid });
+    // Find user by RFID and populate issuedBooks
+    const user = await User.findOne({ rfidNumber: userRfid }).populate("issuedBooks.bookId");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Find the book in the user's issuedBooks array
+    // Find the book using RFID
+    const book = await Book.findOne({ rfid: bookRfid });
+    if (!book) {
+      return res.status(404).json({ message: "Book not found in database" });
+    }
+
+    console.log("User issued books:", user.issuedBooks);
+    console.log("Book ID to match:", book._id.toString());
+
+    // Find the book in user's issued list
     const bookIndex = user.issuedBooks.findIndex(
-      (book) => book.bookId.rfid === bookRfid
+      (b) => b.bookId && b.bookId._id.toString() === book._id.toString()
     );
+
     if (bookIndex === -1) {
       return res.status(404).json({ message: "Book not found in user's issued list" });
     }
 
-    // Remove the book from the user's issuedBooks array
+    // Remove the book from the issuedBooks list
     user.issuedBooks.splice(bookIndex, 1);
     await user.save();
 
-    // Find the book in the Book model and increment its quantity
-    const book = await Book.findOne({ rfid: bookRfid });
-    if (book) {
-      book.quantity += 1;
-      await book.save();
-    }
+    // Increment book quantity
+    book.quantity += 1;
+    await book.save();
 
     res.status(200).json({ message: "Book returned successfully", user });
   } catch (error) {
@@ -44,6 +50,8 @@ router.post("/return-book", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
 
 // POST route to add a new user
 router.post("/add", async (req, res) => {
