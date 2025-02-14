@@ -4,6 +4,7 @@ import Navbar from "./Components/Navbar"; // Assuming the Navbar component is in
 import SearchBook from "./Components/SearchBook";
 import AddUser from "./Components/AddUser";
 import AddBook from "./Components/AddBook";
+import EditBook from "./Components/EditBook";
 import IssueBook from "./Components/IssueBook";
 import IssueHistory from "./Components/IssueHistory";
 
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<SearchBook />} />
         <Route path="/add-user" element={<AddUser />} />
         <Route path="/add-book" element={<AddBook />} />
+        <Route path="/edit/:id" element={<EditBook />} />
         <Route path="/issue-book" element={<IssueBook />} />
         <Route path="/issue-history" element={<IssueHistory />} />
       </Routes>
