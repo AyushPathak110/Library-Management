@@ -7,10 +7,9 @@ import cors from "cors";
 
 const app = express();
 
-// If you want to allow only a specific frontend (e.g., React running on port 5173)
 app.use(
   cors({
-    origin: "http://localhost:5173", // Change this if your frontend runs on a different port
+    origin: "http://localhost:5173", 
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
   })

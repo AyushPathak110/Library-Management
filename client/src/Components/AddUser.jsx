@@ -13,7 +13,7 @@ export default function AddUser() {
   const [scanning, setScanning] = useState(true);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://192.168.137.142:5500/ws"); // Adjust the WebSocket URL as needed
+    const socket = new WebSocket("ws://192.168.137.175:5500/ws"); // Adjust the WebSocket URL as needed
 
     socket.onmessage = (event) => {
       const rfidData = event.data;

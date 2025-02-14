@@ -13,7 +13,7 @@ export default function IssueBook() {
   const [scanningBook, setScanningBook] = useState(false);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://192.168.137.142:5500/ws");
+    const socket = new WebSocket("ws://192.168.137.177:5500/ws");
 
     socket.onmessage = (event) => {
       const rfidData = event.data;
@@ -36,43 +36,39 @@ export default function IssueBook() {
     };
   }, [scanningUser, scanningBook]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleReset = () => {
-    setFormData({
-      userRfid: "",
-      bookRfid: "",
-      issueDate: "",
-      returnDate: "",
-    });
-    setScanningUser(true);
-    setScanningBook(false);
-    setMessage({ text: "", type: "" });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.userRfid || !formData.bookRfid || !formData.issueDate) {
-      setMessage({ text: "Please fill in all required fields.", type: "error" });
-      return;
+  useEffect(() => {
+    if (formData.userRfid && formData.bookRfid) {
+      handleSubmit();
     }
+  }, [formData.userRfid, formData.bookRfid]);
+
+  const handleSubmit = async () => {
+    if (!formData.userRfid || !formData.bookRfid) return;
+
+    // Get the current date
+    const currentDate = new Date();
+   
+    // Set issueDate as current date in YYYY-MM-DD format
+    const issueDate = currentDate.toISOString().split("T")[0];
+
+    // Set returnDate as 15 days after the current date
+    const returnDate = new Date(currentDate);
+    returnDate.setDate(currentDate.getDate() + 15);
+    const returnDateString = returnDate.toISOString().split("T")[0];
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:8080/api/user/update-issued-books/${formData.userRfid}`,
         {
           bookId: formData.bookRfid,
-          issueDate: formData.issueDate,
-          returnDate: formData.returnDate || null,
+          issueDate: issueDate,
+          returnDate: returnDateString,
         }
       );
-
       setMessage({ text: "Book issued successfully!", type: "success" });
-      handleReset();
+      setFormData({ userRfid: "", bookRfid: "", issueDate: "", returnDate: "" });
+      setScanningUser(true);
+      setScanningBook(false);
     } catch (error) {
       setMessage({ text: error.response?.data?.message || "Failed to issue book.", type: "error" });
     }
@@ -91,70 +87,29 @@ export default function IssueBook() {
       <div className="flex justify-center items-center p-6 bg-gray-800">
         <div className="w-full max-w-lg relative">
           <h2 className="text-3xl text-center mb-4">Issue Book</h2>
-          <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+          <form className="flex flex-col space-y-4">
             <div>
               <label className="block text-sm text-white mb-2">User RFID</label>
               <input
                 type="text"
                 name="userRfid"
                 value={formData.userRfid}
-                onChange={handleChange}
                 placeholder="Scan user's RFID.."
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-2 focus:ring-pink-500"
                 readOnly
               />
             </div>
-            
+           
             <div>
               <label className="block text-sm text-white mb-2">Book RFID</label>
               <input
                 type="text"
                 name="bookRfid"
                 value={formData.bookRfid}
-                onChange={handleChange}
                 placeholder="Scan Book's RFID.."
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-2 focus:ring-pink-500"
                 readOnly
               />
-            </div>
-
-            <div>
-              <label className="block text-sm text-white mb-2">Issue Date</label>
-              <input
-                type="date"
-                name="issueDate"
-                value={formData.issueDate}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-2 focus:ring-pink-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-white mb-2">Return Date (Optional)</label>
-              <input
-                type="date"
-                name="returnDate"
-                value={formData.returnDate}
-                onChange={handleChange}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-2 focus:ring-pink-500"
-              />
-            </div>
-
-            <div className="flex justify-between space-x-4">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="w-full sm:w-auto px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
-              >
-                Reset
-              </button>
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-6 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600"
-              >
-                Issue Book
-              </button>
             </div>
           </form>
         </div>

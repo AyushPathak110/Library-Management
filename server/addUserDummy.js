@@ -14,12 +14,12 @@ const dummyUsers = [
     rfidNumber: "RFID1234567890",
     issuedBooks: [
       {
-        bookId: "67ad98daae806011a4357681", // The Great Indian Novel
+        bookId: "67ae35b6e5c50a42b4024687", // The Great Indian Novel
         issueDate: new Date("2025-02-01"),
         returnDate: new Date("2025-02-15"),
       },
       {
-        bookId: "67ad98daae806011a4357683", // The White Tiger
+        bookId: "67ae35b6e5c50a42b4024688", // The White Tiger
         issueDate: new Date("2025-02-05"),
         returnDate: new Date("2025-02-20"),
       },
@@ -32,7 +32,7 @@ const dummyUsers = [
     rfidNumber: "RFID9876543210",
     issuedBooks: [
       {
-        bookId: "67ad98daae806011a4357682", // Wings of Fire
+        bookId: "67ae35b6e5c50a42b4024689", // Wings of Fire
         issueDate: new Date("2025-02-03"),
         returnDate: new Date("2025-02-17"),
       },
@@ -45,22 +45,9 @@ const dummyUsers = [
     rfidNumber: "RFID1122334455",
     issuedBooks: [
       {
-        bookId: "67ad98daae806011a4357684", // Train to Pakistan
+        bookId: "67ae35b6e5c50a42b4024690", // Train to Pakistan
         issueDate: new Date("2025-02-07"),
         returnDate: new Date("2025-02-21"),
-      },
-    ],
-  },
-  {
-    name: "Isha Reddy",
-    email: "isha.reddy@example.com",
-    phoneNumber: "9988776655",
-    rfidNumber: "RFID5566778899",
-    issuedBooks: [
-      {
-        bookId: "67ad98daae806011a4357685", // The Guide
-        issueDate: new Date("2025-02-02"),
-        returnDate: new Date("2025-02-16"),
       },
     ],
   },
@@ -71,7 +58,7 @@ const dummyUsers = [
     rfidNumber: "RFID9988776655",
     issuedBooks: [
       {
-        bookId: "67ad98daae806011a4357687", // God of Small Things
+        bookId: "67ae35b6e5c50a42b4024694", // God of Small Things
         issueDate: new Date("2025-02-06"),
         returnDate: new Date("2025-02-20"),
       }
