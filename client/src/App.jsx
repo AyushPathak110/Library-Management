@@ -6,6 +6,7 @@ import AddUser from "./Components/AddUser";
 import AddBook from "./Components/AddBook";
 import EditBook from "./Components/EditBook";
 import IssueBook from "./Components/IssueBook";
+import ReturnBook from "./Components/ReturnBook";
 import IssueHistory from "./Components/IssueHistory";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/add-book" element={<AddBook />} />
         <Route path="/edit/:id" element={<EditBook />} />
         <Route path="/issue-book" element={<IssueBook />} />
+        <Route path="/return-book" element={<ReturnBook />} />
         <Route path="/issue-history" element={<IssueHistory />} />
       </Routes>
     </>

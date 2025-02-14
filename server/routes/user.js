@@ -1,34 +1,38 @@
 import express from "express";
 import User from "../models/user.js";
-import Book from "../models/book.js"
+import Book from "../models/book.js";
 import mongoose from "mongoose";
 const router = express.Router();
 
-// Return book route
+// Return book route with RFID for both user and book
 router.post("/return-book", async (req, res) => {
   try {
-    const { userId, bookId } = req.body;
+    const { userRfid, bookRfid } = req.body;
 
-    if (!userId || !bookId) {
-      return res.status(400).json({ message: "User ID and Book ID are required" });
+    if (!userRfid || !bookRfid) {
+      return res.status(400).json({ message: "User RFID and Book RFID are required" });
     }
 
-    // Find user and remove book from issuedBooks
-    const user = await User.findById(userId);
+    // Find user by RFID
+    const user = await User.findOne({ rfidNumber: userRfid });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const bookIndex = user.issuedBooks.findIndex((book) => book.bookId.toString() === bookId);
+    // Find the book in the user's issuedBooks array
+    const bookIndex = user.issuedBooks.findIndex(
+      (book) => book.bookId.rfid === bookRfid
+    );
     if (bookIndex === -1) {
-      return res.status(404).json({ message: "Book not found in issued list" });
+      return res.status(404).json({ message: "Book not found in user's issued list" });
     }
 
-    user.issuedBooks.splice(bookIndex, 1); // Remove book from issuedBooks
+    // Remove the book from the user's issuedBooks array
+    user.issuedBooks.splice(bookIndex, 1);
     await user.save();
 
-    // Increment book quantity
-    const book = await Book.findById(bookId);
+    // Find the book in the Book model and increment its quantity
+    const book = await Book.findOne({ rfid: bookRfid });
     if (book) {
       book.quantity += 1;
       await book.save();
@@ -40,7 +44,6 @@ router.post("/return-book", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 // POST route to add a new user
 router.post("/add", async (req, res) => {
@@ -69,40 +72,27 @@ router.post("/add", async (req, res) => {
   }
 });
 
-
-
-
+// PUT route to update issued books by user's RFID
 router.put("/update-issued-books/:rfidNumber", async (req, res) => {
   try {
     const { rfidNumber } = req.params;
     const { bookId, issueDate, returnDate } = req.body;
 
-    console.log("Received PUT request for RFID:", rfidNumber);
-    console.log("Request body:", req.body);
-
     if (!bookId || !issueDate) {
       return res.status(400).json({ message: "Book ID and Issue Date are required" });
     }
 
-    // Debugging: Print all books in the database
-    const allBooks = await Book.find();
-    console.log("Books in DB:", allBooks);
-
     // Find the book by bookId (case-insensitive)
     const book = await Book.findOne({ rfid: { $regex: bookId,} });
-    console.log("Found book:", book);
-
     if (!book) {
-      return res.status(404).json({ message: `Book with ID ${bookId} not found` });
+      return res.status(404).json({ message: `Book with RFID ${bookId} not found` });
     }
 
-    // Find the user by RFID
+    // Find the user by RFID number
     const user = await User.findOne({ rfidNumber });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    console.log("User found:", user);
 
     // Add the book ObjectId to issuedBooks
     user.issuedBooks.push({
@@ -112,15 +102,12 @@ router.put("/update-issued-books/:rfidNumber", async (req, res) => {
     });
 
     await user.save();
-
-    console.log("Issued book updated successfully!");
     res.status(200).json({ message: "Issued books updated successfully", user });
   } catch (error) {
     console.error("Error updating issued books:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
 
 // GET route to fetch all users
 router.get("/", async (req, res) => {

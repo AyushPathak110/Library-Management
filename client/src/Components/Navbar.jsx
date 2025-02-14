@@ -36,6 +36,12 @@ export default function Navbar() {
           Issue Book
         </Link>
         <Link
+          to="/return-book"
+          className="text-white bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-md transition-colors duration-300"
+        >
+          Return Book
+        </Link>
+        <Link
           to="/issue-history"
           className="text-white bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-md transition-colors duration-300"
         >
