@@ -39,7 +39,7 @@ router.post("/return-book", async (req, res) => {
     // Remove the book from the issuedBooks list
     user.issuedBooks.splice(bookIndex, 1);
     await user.save();
-
+    book.isIssued=false;
     // Increment book quantity
     book.quantity += 1;
     await book.save();
@@ -90,17 +90,25 @@ router.put("/update-issued-books/:rfidNumber", async (req, res) => {
       return res.status(400).json({ message: "Book ID and Issue Date are required" });
     }
 
-    // Find the book by bookId (case-insensitive)
-    const book = await Book.findOne({ rfid: { $regex: bookId,} });
+    console.log(`Searching for book with RFID: ${bookId}`);
+    
+    // Find the book by RFID number
+    const book = await Book.findOne({ rfid: bookId });
     if (!book) {
+      console.log(`Book not found with RFID: ${bookId}`);
       return res.status(404).json({ message: `Book with RFID ${bookId} not found` });
     }
+
+    console.log(`Found book: ${book.bookName}, isIssued: ${book.isIssued}`);
 
     // Find the user by RFID number
     const user = await User.findOne({ rfidNumber });
     if (!user) {
+      console.log(`User not found with RFID number: ${rfidNumber}`);
       return res.status(404).json({ message: "User not found" });
     }
+
+    console.log(`Found user: ${user.name}`);
 
     // Add the book ObjectId to issuedBooks
     user.issuedBooks.push({
@@ -109,7 +117,14 @@ router.put("/update-issued-books/:rfidNumber", async (req, res) => {
       returnDate: returnDate || null,
     });
 
+    // Update isIssued field using Mongoose save() method
+    book.isIssued = true;
+    await book.save();
+
     await user.save();
+    
+    console.log(`Book ${book.bookName} marked as issued.`);
+
     res.status(200).json({ message: "Issued books updated successfully", user });
   } catch (error) {
     console.error("Error updating issued books:", error);
@@ -126,6 +141,27 @@ router.get("/", async (req, res) => {
     res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.get("/check-book/:bookId", async (req, res) => {
+  try {
+    const { bookId } = req.params;
+
+    // Find the book in the database
+    const book = await Book.findOne({rfid:bookId});
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    // Check if the book is issued
+    const isIssued = book.isIssued || false; // Assuming your book model has an 'isIssued' field
+
+    res.json({ issued: isIssued, status: isIssued ? "off" : "on" });
+  } catch (error) {
+    console.error("Error checking book status:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });

@@ -13,7 +13,7 @@ export default function IssueBook() {
   const [scanningBook, setScanningBook] = useState(false);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://192.168.137.136:5500/ws");
+    const socket = new WebSocket("ws://192.168.137.34:5500/ws");
 
     socket.onmessage = (event) => {
       const rfidData = event.data;
